@@ -8,7 +8,8 @@ import logging
 from typing import List, Dict, Tuple, Optional
 from datetime import datetime
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_pinecone import PineconeVectorStore
+from pinecone import Pinecone
+from langchain_core.documents import Document
 import tiktoken
 from fpdf import FPDF
 import requests
@@ -132,16 +133,65 @@ st.markdown("---")
 # --- 5. CACHED RESOURCES ---
 @st.cache_resource
 def init_vector_db():
+
     try:
+
+        api_key = get_secret("PINECONE_API_KEY")
+
+        if not api_key:
+
+            st.error("PINECONE_API_KEY missing")
+
+            return None
+
         embeddings = HuggingFaceEmbeddings(
-            model_name="all-MiniLM-L6-v2",
-            model_kwargs={"device": "cpu"}
+
+            model_name="BAAI/bge-small-en-v1.5",
+
+            model_kwargs={
+
+                "device":"cpu"
+
+            },
+
+            encode_kwargs={
+
+                "normalize_embeddings":True
+
+            }
+
         )
-        db = PineconeVectorStore(index_name=INDEX_NAME, embedding=embeddings)
+
+        pc = Pinecone(
+
+            api_key=api_key
+
+        )
+
+        index = pc.Index(
+
+            INDEX_NAME
+
+        )
+
         logger.info("✓ Pinecone initialized")
-        return db
+
+        return {
+
+            "index":index,
+
+            "embeddings":embeddings
+
+        }
+
     except Exception as e:
-        st.error(f"❌ Pinecone initialization failed: {e}")
+
+        st.error(
+
+            f"Pinecone initialization failed: {e}"
+
+        )
+
         return None
 
 @st.cache_resource
@@ -830,7 +880,51 @@ if st.button("🚀 Execute Analysis", type="primary", use_container_width=True):
                 status_text.text("Step 1/3: Scanning Pinecone Database...")
                 progress_bar.progress(20)
                 t0 = time.time()
-                docs = db.similarity_search(user_query, k=search_depth)
+                query_vector = db["embeddings"].embed_query(
+    user_query
+)
+
+results = db["index"].query(
+
+    vector=query_vector,
+
+    top_k=search_depth,
+
+    include_metadata=True
+
+)
+
+docs=[]
+
+for match in results.get("matches",[]):
+
+    metadata = match.get(
+
+        "metadata",
+
+        {}
+
+    )
+
+    content = metadata.get(
+
+        "text",
+
+        ""
+
+    )
+
+    docs.append(
+
+        Document(
+
+            page_content=content,
+
+            metadata=metadata
+
+        )
+
+    )
                 search_time = time.time() - t0
 
                 if docs:
