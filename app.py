@@ -1,10 +1,6 @@
-import sys
-# --- 1. BYPASS STREAMLIT DEPLOYMENT MEMORY CONFLICTS ---
-sys.modules.pop('pinecone', None)
-sys.modules.pop('pinecone-client', None)
 
 import os
-os.environ["PINECONE_DISABLE_STRICT_VALIDATION"] = "1"
+
 
 import streamlit as st
 import time
