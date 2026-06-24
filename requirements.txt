@@ -10,24 +10,24 @@ langchain-community==0.3.27
 
 langchain-core==0.3.69
 
-langchain-huggingface
+langchain-huggingface==0.3.0
 
-pinecone
+pinecone==7.3.0
 
-sentence-transformers
+sentence-transformers==5.0.0
 
-tiktoken
+tiktoken==0.9.0
 
-pypdf
+pypdf==5.7.0
 
-python-dotenv
+python-dotenv==1.1.1
 
-pandas
+pandas==2.3.1
 
-numpy
+numpy==2.3.2
 
-markdown
+markdown==3.8.2
 
-fpdf2
+fpdf2==2.8.4
 
-requests
+requests==2.32.4
