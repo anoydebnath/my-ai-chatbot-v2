@@ -10,11 +10,7 @@ langchain-community==0.3.27
 
 langchain-core==0.3.69
 
-langchain-huggingface==0.3.0
-
-langchain-pinecone==0.2.8
-
-pinecone==6.0.2
+pinecone==7.3.0
 
 sentence-transformers==5.0.0
 
