@@ -1,7 +1,4 @@
-
 import os
-
-
 import streamlit as st
 import time
 import logging
@@ -133,65 +130,41 @@ st.markdown("---")
 # --- 5. CACHED RESOURCES ---
 @st.cache_resource
 def init_vector_db():
-
     try:
-
         api_key = get_secret("PINECONE_API_KEY")
-
         if not api_key:
-
             st.error("PINECONE_API_KEY missing")
-
             return None
 
         embeddings = HuggingFaceEmbeddings(
-
             model_name="BAAI/bge-small-en-v1.5",
-
             model_kwargs={
-
                 "device":"cpu"
-
             },
-
             encode_kwargs={
-
                 "normalize_embeddings":True
-
             }
-
         )
 
         pc = Pinecone(
-
             api_key=api_key
-
         )
 
         index = pc.Index(
-
             INDEX_NAME
-
         )
 
         logger.info("✓ Pinecone initialized")
 
         return {
-
             "index":index,
-
             "embeddings":embeddings
-
         }
 
     except Exception as e:
-
         st.error(
-
             f"Pinecone initialization failed: {e}"
-
         )
-
         return None
 
 @st.cache_resource
@@ -881,30 +854,30 @@ if st.button("🚀 Execute Analysis", type="primary", use_container_width=True):
                 progress_bar.progress(20)
                 t0 = time.time()
 
-query_vector = db["embeddings"].embed_query(user_query)
+                # --- FIX: THIS BLOCK IS NOW PROPERLY INDENTED ---
+                query_vector = db["embeddings"].embed_query(user_query)
 
-results = db["index"].query(
-    vector=query_vector,
-    top_k=search_depth,
-    include_metadata=True
-)
+                results = db["index"].query(
+                    vector=query_vector,
+                    top_k=search_depth,
+                    include_metadata=True
+                )
 
-docs = []
+                docs = []
 
-for match in results.get("matches", []):
+                for match in results.get("matches", []):
+                    metadata = match.get("metadata", {})
+                    content = metadata.get("text", "")
+                    
+                    docs.append(
+                        Document(
+                            page_content=content,
+                            metadata=metadata
+                        )
+                    )
 
-    metadata = match.get("metadata", {})
-
-    content = metadata.get("text", "")
-
-    docs.append(
-        Document(
-            page_content=content,
-            metadata=metadata
-        )
-    )
-
-search_time = time.time() - t0
+                search_time = time.time() - t0
+                # ------------------------------------------------
 
                 if docs:
                     db_context, metadata_refs = assemble_context(docs)
