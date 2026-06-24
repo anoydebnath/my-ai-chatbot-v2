@@ -880,52 +880,31 @@ if st.button("🚀 Execute Analysis", type="primary", use_container_width=True):
                 status_text.text("Step 1/3: Scanning Pinecone Database...")
                 progress_bar.progress(20)
                 t0 = time.time()
-                query_vector = db["embeddings"].embed_query(
-    user_query
-)
+
+query_vector = db["embeddings"].embed_query(user_query)
 
 results = db["index"].query(
-
     vector=query_vector,
-
     top_k=search_depth,
-
     include_metadata=True
-
 )
 
-docs=[]
+docs = []
 
-for match in results.get("matches",[]):
+for match in results.get("matches", []):
 
-    metadata = match.get(
+    metadata = match.get("metadata", {})
 
-        "metadata",
-
-        {}
-
-    )
-
-    content = metadata.get(
-
-        "text",
-
-        ""
-
-    )
+    content = metadata.get("text", "")
 
     docs.append(
-
         Document(
-
             page_content=content,
-
             metadata=metadata
-
         )
-
     )
-                search_time = time.time() - t0
+
+search_time = time.time() - t0
 
                 if docs:
                     db_context, metadata_refs = assemble_context(docs)
