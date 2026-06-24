@@ -1,0 +1,10 @@
+streamlit
+langchain-huggingface
+langchain-pinecone
+pinecone-client
+tiktoken
+fpdf
+duckduckgo-search
+sentence-transformers
+google-genai
+groq
