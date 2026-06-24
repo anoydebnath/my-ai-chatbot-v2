@@ -14,7 +14,7 @@ langchain-huggingface==0.3.0
 
 langchain-pinecone==0.2.8
 
-pinecone==5.4.2
+pinecone==6.0.2
 
 sentence-transformers==5.0.0
 
